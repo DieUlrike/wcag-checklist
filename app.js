@@ -174,7 +174,7 @@ function renderForm() {
 }
 
 // =====================================
-// Markdown-Export (inkl. Meta)
+// Markdown-Export (Bericht mit Begründungen)
 // =====================================
 function exportMarkdown() {
   const now = new Date().toISOString().slice(0,19).replace('T',' ');
@@ -186,33 +186,63 @@ function exportMarkdown() {
     all:  criteria.length
   };
 
+  const passed = criteria.filter(c => c.status === "pass");
+  const failed = criteria.filter(c => c.status === "fail");
+
   const parts = [];
-  parts.push('# WCAG 2.2 – Accessibility Audit');
+  parts.push('# WCAG Auditbericht');
+  parts.push('');
   parts.push(`**Unternehmen:** ${meta.company || "—"}`);
   parts.push(`**Webseite:** ${meta.url || "—"}`);
-  parts.push(`**Erstellt:** ${now}`);
+  parts.push(`**Audit-Datum:** ${now}`);
+  parts.push('');
+  parts.push('---');
+  parts.push('');
+  parts.push('Sehr geehrte Damen und Herren,');
+  parts.push('');
+  parts.push('gern haben wir das Audit Ihrer Webseite durchgeführt. Nachfolgend finden Sie die Zusammenfassung der Ergebnisse.');
+  parts.push('');
+  parts.push('---');
   parts.push('');
   parts.push('## Zusammenfassung');
+  parts.push('');
   parts.push(`- Gesamt: ${totals.all}`);
   parts.push(`- Bestanden: ${totals.pass}`);
-  parts.push(`- Offen/Handlungsbedarf: ${totals.fail}`);
+  parts.push(`- Handlungsbedarf: ${totals.fail}`);
   parts.push(`- Nicht anwendbar: ${totals.na}`);
   parts.push('');
-
-  parts.push('## Details');
-  for (const c of criteria) {
-    const statusLabel = c.status === 'pass' ? 'Bestanden'
-                      : c.status === 'fail' ? 'Handlungsbedarf'
-                      : 'Nicht anwendbar';
-    parts.push(`### ${c.id} – ${c.titel}${c.level ? ` (Level ${c.level})` : ""}`);
-    parts.push(`**Status:** ${statusLabel}`);
-    if (c.tool) parts.push(`**Geprüft mit:** ${c.tool}`);
-    if (c.ergebnis) parts.push(`**Ergebnis:** ${c.ergebnis}`);
-    parts.push('');
+  parts.push('---');
+  parts.push('');
+  parts.push('## Bestandene Kriterien');
+  parts.push('');
+  if (passed.length === 0) {
+    parts.push('_Keine bestandenen Kriterien vorhanden._');
+  } else {
+    for (const c of passed) {
+      parts.push(`- **${c.id} – ${c.titel}**${c.level ? ` (Level ${c.level})` : ''}`);
+    }
   }
+  parts.push('');
+  parts.push('---');
+  parts.push('');
+  parts.push('## Fehlgeschlagene Kriterien');
+  parts.push('');
+  if (failed.length === 0) {
+    parts.push('_Keine fehlgeschlagenen Kriterien vorhanden._');
+  } else {
+    for (const c of failed) {
+      parts.push(`- **${c.id} – ${c.titel}**${c.level ? ` (Level ${c.level})` : ''}`);
+      if (c.tool)     parts.push(`  - Geprüft mit: ${c.tool}`);
+      if (c.ergebnis) parts.push(`  - Ergebnis: ${c.ergebnis}`);
+    }
+  }
+  parts.push('');
+  parts.push('---');
+  parts.push('');
+  parts.push('Gern unterstützen wir Sie bei der Überarbeitung der Kriterien, die fehlgeschlagen sind.');
+  parts.push('');
 
   const md = parts.join('\n');
-
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -223,6 +253,7 @@ function exportMarkdown() {
   a.remove();
   URL.revokeObjectURL(url);
 }
+
 document.getElementById('export-md')?.addEventListener('click', exportMarkdown);
 
 // =====================================
