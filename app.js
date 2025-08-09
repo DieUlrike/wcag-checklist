@@ -12,6 +12,27 @@ function freshChecklistFromTemplate() {
   return CHECKLIST_TEMPLATE.map(i => ({ ...i }));
 }
 
+// ---- Persistenz (Autosave) ----
+const STORAGE_KEY = "wcag-checklist-current";
+
+function saveToLocal() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(criteria)); }
+  catch (e) { console.warn("Konnte nicht speichern:", e); }
+}
+
+function loadFromLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (Array.isArray(saved)) {
+      criteria.length = 0;
+      for (const item of saved) criteria.push(item);
+    }
+  } catch (e) { console.warn("Konnte nicht laden:", e); }
+}
+
+
 
 // =========================
 // Kriterien-Daten (Beispiel)
@@ -41,6 +62,76 @@ const criteria = [
 ];
 
 console.log("WCAG Checkliste – Prototyp geladen");
+
+// ---- Eingabeoberfläche rendern ----
+function renderForm() {
+  const content = document.getElementById('content');
+  if (!content) return;
+
+  // kurze Zusammenfassung oben
+  const totals = {
+    pass: criteria.filter(c => c.status === "pass").length,
+    fail: criteria.filter(c => c.status === "fail").length,
+    na:   criteria.filter(c => c.status === "na").length,
+    all:  criteria.length
+  };
+
+  content.innerHTML = `
+    <section>
+      <h2>Zusammenfassung</h2>
+      <ul>
+        <li>Gesamt: ${criteria.length}</li>
+        <li>Bestanden: ${criteria.filter(c=>c.status==="pass").length}</li>
+        <li>Handlungsbedarf: ${criteria.filter(c=>c.status==="fail").length}</li>
+        <li>Nicht anwendbar: ${criteria.filter(c=>c.status==="na").length}</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Kriterien ausfüllen</h2>
+      <div id="crit-list"></div>
+    </section>
+  `;
+
+  const list = document.getElementById('crit-list');
+  list.innerHTML = criteria.map((c, i) => {
+    return `
+      <article style="border:1px solid #ddd;padding:0.75rem;margin:0 0 .75rem 0">
+        <h3 style="margin:0 0 .5rem 0">${c.id} – ${c.titel}${c.level ? ` (Level ${c.level})` : ""}</h3>
+
+        <label>
+          <span>Geprüft mit</span><br/>
+          <input type="text" id="tool-${i}" value="${c.tool ?? ''}" />
+        </label>
+        <br/><br/>
+
+        <label>
+          <span>Ergebnis / Befund</span><br/>
+          <textarea id="erg-${i}" rows="2">${c.ergebnis ?? ''}</textarea>
+        </label>
+        <br/><br/>
+
+        <fieldset>
+          <legend>Status</legend>
+          <label><input type="radio" name="status-${i}" value="pass" ${c.status==='pass'?'checked':''}/> Bestanden</label>
+          <label style="margin-left:1rem;"><input type="radio" name="status-${i}" value="fail" ${c.status==='fail'?'checked':''}/> Handlungsbedarf</label>
+          <label style="margin-left:1rem;"><input type="radio" name="status-${i}" value="na"   ${c.status==='na'  ?'checked':''}/> Nicht anwendbar</label>
+        </fieldset>
+      </article>
+    `;
+  }).join('');
+
+  // Events binden + Autosave
+  criteria.forEach((c, i) => {
+    const toolEl = document.getElementById(`tool-${i}`);
+    const ergEl  = document.getElementById(`erg-${i}`);
+    const radios = list.querySelectorAll(`input[name="status-${i}"]`);
+
+    toolEl.addEventListener('input', () => { c.tool = toolEl.value; saveToLocal(); renderForm(); });
+    ergEl.addEventListener('input',  () => { c.ergebnis = ergEl.value; saveToLocal(); });
+    radios.forEach(r => r.addEventListener('change', () => { c.status = r.value; saveToLocal(); renderForm(); }));
+  });
+}
+
 
 // =====================================
 // Markdown-Export aus den echten Daten
@@ -180,3 +271,6 @@ document.getElementById('new-audit')?.addEventListener('click', () => {
   alert("Neue, leere Checkliste aus der Vorlage erstellt.");
 });
 
+// Beim Laden: gespeicherten Stand laden und Formular anzeigen
+loadFromLocal();
+renderForm();
