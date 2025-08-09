@@ -1,4 +1,10 @@
-// Feste WCAG-Startvorlage (klein; später durch komplette 2.2 AA ersetzt)
+// ---- Meta-Daten zum Audit (Projektinfos) ----
+let meta = {
+  company: "",   // Unternehmensname
+  url: ""        // Webseiten-URL
+};
+
+// (Kleine Starter-Liste; tatsächliche 2.2-AA-Vorlage kommt aus wcag-template.json)
 const CHECKLIST_TEMPLATE = [
   { id: "1.1.1", titel: "Nicht-Text-Inhalte", level: "A",  tool: "", ergebnis: "", status: "na" },
   { id: "1.3.1", titel: "Info und Beziehungen", level: "A", tool: "", ergebnis: "", status: "na" },
@@ -7,7 +13,6 @@ const CHECKLIST_TEMPLATE = [
   { id: "2.4.3", titel: "Fokus-Reihenfolge", level: "A", tool: "", ergebnis: "", status: "na" }
 ];
 
-// frische Arbeitskopie aus der Vorlage erzeugen
 function freshChecklistFromTemplate() {
   return CHECKLIST_TEMPLATE.map(i => ({ ...i }));
 }
@@ -16,8 +21,12 @@ function freshChecklistFromTemplate() {
 const STORAGE_KEY = "wcag-checklist-current";
 
 function saveToLocal() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(criteria)); }
-  catch (e) { console.warn("Konnte nicht speichern:", e); }
+  try {
+    const payload = { meta, criteria };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch (e) {
+    console.warn("Konnte nicht speichern:", e);
+  }
 }
 
 function loadFromLocal() {
@@ -25,27 +34,92 @@ function loadFromLocal() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const saved = JSON.parse(raw);
+
+    // Rückwärtskompatibel: frühe Version speicherte nur das Array
     if (Array.isArray(saved)) {
       criteria.length = 0;
       for (const item of saved) criteria.push(item);
+      return;
     }
-  } catch (e) { console.warn("Konnte nicht laden:", e); }
+
+    // Neues Format: { meta, criteria }
+    if (saved && Array.isArray(saved.criteria)) {
+      meta = { company: "", url: "", ...(saved.meta || {}) };
+      criteria.length = 0;
+      for (const item of saved.criteria) criteria.push(item);
+    }
+  } catch (e) {
+    console.warn("Konnte nicht laden:", e);
+  }
 }
 
-
-
-// Arbeitskopie: startet leer aus der Vorlage (wird ggf. durch loadFromLocal überschrieben)
+// Arbeitskopie: startet aus der kleinen Vorlage (wird ggf. durch loadFromLocal überschrieben)
 let criteria = freshChecklistFromTemplate();
 
-
 console.log("WCAG Checkliste – Prototyp geladen");
+
+// ---- Hilfen für „Neues Audit starten“ (Meta-Formular) ----
+function isValidUrl(u) {
+  try {
+    if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+    const { protocol, hostname } = new URL(u);
+    return (protocol === "http:" || protocol === "https:") && !!hostname;
+  } catch { return false; }
+}
+
+function normalizeUrl(u) {
+  if (!u) return "";
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  try { return new URL(u).toString(); } catch { return u; }
+}
+
+// Zeigt ein Formular im #content, sammelt company/url und ruft dann onConfirm()
+function showNewAuditForm(onConfirm) {
+  const content = document.getElementById('content');
+  if (!content) return;
+
+  content.innerHTML = `
+    <section style="border:1px solid #ddd;padding:1rem;margin:1rem 0;">
+      <h2>Neues Audit starten</h2>
+      <p>Bitte Projektinfos angeben. Diese erscheinen später im Bericht.</p>
+
+      <label>
+        <div>Unternehmensname <span aria-hidden="true">*</span></div>
+        <input id="meta-company" type="text" placeholder="z. B. Beispiel GmbH" style="width:100%;max-width:480px;">
+      </label>
+      <br/><br/>
+
+      <label>
+        <div>Webseiten-URL <span aria-hidden="true">*</span></div>
+        <input id="meta-url" type="text" placeholder="z. B. https://www.beispiel.de" style="width:100%;max-width:480px;">
+      </label>
+      <br/><br/>
+
+      <button id="start-audit">Audit starten</button>
+    </section>
+  `;
+
+  document.getElementById('start-audit')?.addEventListener('click', () => {
+    const companyEl = document.getElementById('meta-company');
+    const urlEl = document.getElementById('meta-url');
+    const company = companyEl.value.trim();
+    const urlRaw  = urlEl.value.trim();
+
+    if (!company) { alert("Bitte Unternehmensname eingeben."); companyEl.focus(); return; }
+    if (!isValidUrl(urlRaw)) { alert("Bitte eine gültige URL eingeben (z. B. https://… )."); urlEl.focus(); return; }
+
+    meta.company = company;
+    meta.url = normalizeUrl(urlRaw);
+
+    onConfirm?.();
+  });
+}
 
 // ---- Eingabeoberfläche rendern ----
 function renderForm() {
   const content = document.getElementById('content');
   if (!content) return;
 
-  // kurze Zusammenfassung oben
   const totals = {
     pass: criteria.filter(c => c.status === "pass").length,
     fail: criteria.filter(c => c.status === "fail").length,
@@ -57,10 +131,14 @@ function renderForm() {
     <section>
       <h2>Zusammenfassung</h2>
       <ul>
-        <li>Gesamt: ${criteria.length}</li>
-        <li>Bestanden: ${criteria.filter(c=>c.status==="pass").length}</li>
-        <li>Handlungsbedarf: ${criteria.filter(c=>c.status==="fail").length}</li>
-        <li>Nicht anwendbar: ${criteria.filter(c=>c.status==="na").length}</li>
+        <li><strong>Unternehmen:</strong> ${meta.company || "—"}</li>
+        <li><strong>Webseite:</strong> ${meta.url || "—"}</li>
+      </ul>
+      <ul>
+        <li>Gesamt: ${totals.all}</li>
+        <li>Bestanden: ${totals.pass}</li>
+        <li>Handlungsbedarf: ${totals.fail}</li>
+        <li>Nicht anwendbar: ${totals.na}</li>
       </ul>
     </section>
     <section>
@@ -109,14 +187,12 @@ function renderForm() {
   });
 }
 
-
 // =====================================
-// Markdown-Export aus den echten Daten
+// Markdown-Export (mit Meta)
 // =====================================
 function exportMarkdown() {
   const now = new Date().toISOString().slice(0,19).replace('T',' ');
 
-  // Totals berechnen
   const totals = {
     pass: criteria.filter(c => c.status === "pass").length,
     fail: criteria.filter(c => c.status === "fail").length,
@@ -124,10 +200,11 @@ function exportMarkdown() {
     all:  criteria.length
   };
 
-  // Bericht zusammenbauen
   const parts = [];
-  parts.push('# WCAG Checkliste – Bericht');
-  parts.push(`Erstellt: ${now}`);
+  parts.push('# WCAG 2.2 – Accessibility Audit');
+  parts.push(`**Unternehmen:** ${meta.company || "—"}`);
+  parts.push(`**Webseite:** ${meta.url || "—"}`);
+  parts.push(`**Erstellt:** ${now}`);
   parts.push('');
   parts.push('## Zusammenfassung');
   parts.push(`- Gesamt: ${totals.all}`);
@@ -141,7 +218,7 @@ function exportMarkdown() {
     const statusLabel = c.status === 'pass' ? 'Bestanden'
                       : c.status === 'fail' ? 'Handlungsbedarf'
                       : 'Nicht anwendbar';
-    parts.push(`### ${c.id} – ${c.titel}`);
+    parts.push(`### ${c.id} – ${c.titel}${c.level ? ` (Level ${c.level})` : ""}`);
     parts.push(`**Status:** ${statusLabel}`);
     if (c.tool) parts.push(`**Geprüft mit:** ${c.tool}`);
     if (c.ergebnis) parts.push(`**Ergebnis:** ${c.ergebnis}`);
@@ -150,7 +227,6 @@ function exportMarkdown() {
 
   const md = parts.join('\n');
 
-  // Download auslösen
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -162,17 +238,18 @@ function exportMarkdown() {
   URL.revokeObjectURL(url);
 }
 
-// Button verdrahten
+// Buttons verdrahten
 document.getElementById('export-md')?.addEventListener('click', exportMarkdown);
 
 // =====================================
-// JSON-Export: aktuellen Stand speichern
+// JSON-Export (mit Meta)
 // =====================================
 function exportJSON() {
   const payload = {
     erstellt: new Date().toISOString(),
-    version: "0.1",
-    criteria // exportiert dein aktuelles Array mit
+    version: "2.2-AA",
+    meta,
+    criteria
   };
 
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
@@ -180,25 +257,21 @@ function exportJSON() {
   const a = document.createElement("a");
   const stamp = new Date().toISOString().replace(/[:]/g, "-");
   a.href = url;
-  a.download = `wcag-checkliste-${stamp}.json`;
+  a.download = `wcag-audit-${stamp}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
 }
-
 document.getElementById('export-json')?.addEventListener('click', exportJSON);
 
 // =====================================
 // JSON-Import (Datei wählen und laden)
 // =====================================
-
-// Button öffnet den versteckten <input type="file">
 document.getElementById('import-json-btn')?.addEventListener('click', () => {
   document.getElementById('import-json')?.click();
 });
 
-// Datei einlesen, validieren, übernehmen
 document.getElementById('import-json')?.addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
@@ -207,60 +280,60 @@ document.getElementById('import-json')?.addEventListener('change', async (e) => 
     const text = await file.text();
     const data = JSON.parse(text);
 
-    // Erwartetes Format: { erstellt, version, criteria: [...] }
     if (!data || !Array.isArray(data.criteria)) {
       alert("Ungültiges Format. Erwartet wird ein Objekt mit Feld 'criteria' (Array).");
       return;
     }
 
-    // Bestehendes Array ersetzen
+    // Meta übernehmen (falls vorhanden), sonst leere Defaults
+    meta = { company: "", url: "", ...(data.meta || {}) };
+
+    // Kriterien ersetzen
     criteria.length = 0;
     for (const item of data.criteria) criteria.push(item);
 
-    // Optional: lokale Speicherung/UI neu aufbauen (nur wenn vorhanden)
-    if (typeof saveToLocal === 'function') saveToLocal();
-    if (typeof renderForm === 'function') renderForm();
+    saveToLocal();
+    renderForm();
 
-    alert(`Import erfolgreich: ${criteria.length} Kriterien geladen.`);
+    alert(`Import erfolgreich: ${criteria.length} Kriterien geladen${meta.company ? " – " + meta.company : ""}.`);
   } catch (err) {
     console.warn("Import fehlgeschlagen:", err);
     alert("Konnte die Datei nicht lesen. Ist es gültiges JSON?");
   } finally {
-    // Zurücksetzen, damit dieselbe Datei erneut importiert werden kann
     e.target.value = "";
   }
 });
 
-// Neues Audit aus der festen Vorlage erstellen
-// Neues Audit: Vorlage aus JSON laden und übernehmen
-document.getElementById('new-audit')?.addEventListener('click', async () => {
+// =====================================
+// Neues Audit: Vorlage aus JSON laden
+// =====================================
+document.getElementById('new-audit')?.addEventListener('click', () => {
   if (!confirm("Neues Audit starten? Ungespeicherte Änderungen gehen verloren.")) return;
 
-  try {
-    // Pfad anpassen, falls die Datei woanders liegt
-    const res = await fetch('./wcag-template.json?v=' + Date.now()); // Cache-Busting
-    if (!res.ok) throw new Error('Vorlage konnte nicht geladen werden (' + res.status + ')');
+  // 1) Zuerst Projektinfos abfragen
+  showNewAuditForm(async () => {
+    try {
+      // 2) Danach Vorlage laden
+      const res = await fetch('./wcag-template.json?v=' + Date.now()); // Cache-Busting
+      if (!res.ok) throw new Error('Vorlage konnte nicht geladen werden (' + res.status + ')');
+      const data = await res.json();
+      if (!data || !Array.isArray(data.criteria)) throw new Error("Ungültige Vorlage: Feld 'criteria' (Array) fehlt.");
 
-    const data = await res.json();
-    if (!data || !Array.isArray(data.criteria)) {
-      throw new Error("Ungültige Vorlage: Feld 'criteria' (Array) fehlt.");
+      // 3) Kriterien übernehmen
+      criteria.length = 0;
+      for (const item of data.criteria) criteria.push(item);
+
+      // 4) Speichern & UI zeichnen
+      saveToLocal();
+      renderForm();
+
+      alert(`Audit gestartet für: ${meta.company}\nURL: ${meta.url}\nKriterien: ${criteria.length}`);
+    } catch (err) {
+      console.warn(err);
+      alert('Fehler beim Laden der Vorlage: ' + err.message);
     }
-
-    // Arbeitsdaten ersetzen
-    criteria.length = 0;
-    for (const item of data.criteria) criteria.push(item);
-
-    // Speichern & UI aktualisieren
-    saveToLocal?.();
-    renderForm?.();
-
-    alert(`Neue WCAG-Vorlage geladen: ${criteria.length} Kriterien.`);
-  } catch (err) {
-    console.warn(err);
-    alert('Fehler beim Laden der Vorlage: ' + err.message);
-  }
+  });
 });
-
 
 // Beim Laden: gespeicherten Stand laden und Formular anzeigen
 loadFromLocal();
