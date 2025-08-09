@@ -1,2 +1,110 @@
-body { font: 16px/1.5 system-ui, sans-serif; margin: 2rem; }
-header { margin-bottom: 1rem; }
+/* Hintergrund fixieren und Gradient über die ganze Seite */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  background: linear-gradient(to bottom, #f5f7fa, #e4ebf1);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Allgemeines Layout */
+header {
+  background: #334155;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Buttons */
+button {
+  background: #4b5563;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  margin: 0.3rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #1f2937;
+}
+
+/* Karten-Style für Kriterien */
+#crit-list article {
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #ddd;
+  background: white;
+  transition: background-color 0.3s ease;
+}
+
+/* Statusfarben */
+.status-pass {
+  border-left: 6px solid #16a34a;
+  background-color: #dcfce7;
+}
+
+.status-fail {
+  border-left: 6px solid #dc2626;
+  background-color: #fee2e2;
+}
+
+.status-na {
+  border-left: 6px solid #6b7280;
+  background-color: #f3f4f6;
+}
+
+/* Eingabeelemente */
+input[type="text"], textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.4rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+}
+
+legend {
+  font-weight: bold;
+}
+
+/* Zusammenfassung */
+section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+section ul li {
+  margin-bottom: 0.3rem;
+}
+
+/* Statusfarben mit höherer Spezifität */
+#crit-list article.status-pass {
+  background-color: #dcfce7 !important;
+  border-left: 6px solid #16a34a;
+}
+#crit-list article.status-fail {
+  background-color: #fee2e2 !important;
+  border-left: 6px solid #dc2626;
+}
+#crit-list article.status-na {
+  background-color: #f3f4f6 !important;
+  border-left: 6px solid #6b7280;
+}

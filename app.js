@@ -1,21 +1,5 @@
-// ---- Meta-Daten zum Audit (Projektinfos) ----
-let meta = {
-  company: "",   // Unternehmensname
-  url: ""        // Webseiten-URL
-};
-
-// (Kleine Starter-Liste; tatsächliche 2.2-AA-Vorlage kommt aus wcag-template.json)
-const CHECKLIST_TEMPLATE = [
-  { id: "1.1.1", titel: "Nicht-Text-Inhalte", level: "A",  tool: "", ergebnis: "", status: "na" },
-  { id: "1.3.1", titel: "Info und Beziehungen", level: "A", tool: "", ergebnis: "", status: "na" },
-  { id: "1.4.3", titel: "Kontrast Minimum", level: "AA", tool: "", ergebnis: "", status: "na" },
-  { id: "2.1.1", titel: "Tastatur", level: "A", tool: "", ergebnis: "", status: "na" },
-  { id: "2.4.3", titel: "Fokus-Reihenfolge", level: "A", tool: "", ergebnis: "", status: "na" }
-];
-
-function freshChecklistFromTemplate() {
-  return CHECKLIST_TEMPLATE.map(i => ({ ...i }));
-}
+// ---- Meta (Projektinfos) ----
+let meta = { company: "", url: "" };
 
 // ---- Persistenz (Autosave) ----
 const STORAGE_KEY = "wcag-checklist-current";
@@ -35,7 +19,7 @@ function loadFromLocal() {
     if (!raw) return;
     const saved = JSON.parse(raw);
 
-    // Rückwärtskompatibel: frühe Version speicherte nur das Array
+    // Rückwärtskompatibel: ganz alte Versionen speicherten nur das Array
     if (Array.isArray(saved)) {
       criteria.length = 0;
       for (const item of saved) criteria.push(item);
@@ -53,12 +37,12 @@ function loadFromLocal() {
   }
 }
 
-// Arbeitskopie: startet aus der kleinen Vorlage (wird ggf. durch loadFromLocal überschrieben)
-let criteria = freshChecklistFromTemplate();
+// Arbeitskopie (wird via New Audit/Import gefüllt oder aus LocalStorage)
+let criteria = [];
 
 console.log("WCAG Checkliste – Prototyp geladen");
 
-// ---- Hilfen für „Neues Audit starten“ (Meta-Formular) ----
+// ---- Helpers für Meta-Form ----
 function isValidUrl(u) {
   try {
     if (!/^https?:\/\//i.test(u)) u = "https://" + u;
@@ -66,14 +50,13 @@ function isValidUrl(u) {
     return (protocol === "http:" || protocol === "https:") && !!hostname;
   } catch { return false; }
 }
-
 function normalizeUrl(u) {
   if (!u) return "";
   if (!/^https?:\/\//i.test(u)) u = "https://" + u;
   try { return new URL(u).toString(); } catch { return u; }
 }
 
-// Zeigt ein Formular im #content, sammelt company/url und ruft dann onConfirm()
+// Inline-Formular für Unternehmensname/URL anzeigen und dann onConfirm() ausführen
 function showNewAuditForm(onConfirm) {
   const content = document.getElementById('content');
   if (!content) return;
@@ -115,7 +98,7 @@ function showNewAuditForm(onConfirm) {
   });
 }
 
-// ---- Eingabeoberfläche rendern ----
+// ---- UI rendern (mit farbigen Karten je Status) ----
 function renderForm() {
   const content = document.getElementById('content');
   if (!content) return;
@@ -149,8 +132,11 @@ function renderForm() {
 
   const list = document.getElementById('crit-list');
   list.innerHTML = criteria.map((c, i) => {
+    const statusClass = c.status === "pass" ? "status-pass"
+                       : c.status === "fail" ? "status-fail"
+                       : "status-na";
     return `
-      <article style="border:1px solid #ddd;padding:0.75rem;margin:0 0 .75rem 0">
+      <article class="${statusClass}">
         <h3 style="margin:0 0 .5rem 0">${c.id} – ${c.titel}${c.level ? ` (Level ${c.level})` : ""}</h3>
 
         <label>
@@ -175,20 +161,20 @@ function renderForm() {
     `;
   }).join('');
 
-  // Events binden + Autosave
+  // Events binden + Autosave (und neu rendern, damit die Farbklasse wechselt)
   criteria.forEach((c, i) => {
     const toolEl = document.getElementById(`tool-${i}`);
     const ergEl  = document.getElementById(`erg-${i}`);
     const radios = list.querySelectorAll(`input[name="status-${i}"]`);
 
-    toolEl.addEventListener('input', () => { c.tool = toolEl.value; saveToLocal(); renderForm(); });
+    toolEl.addEventListener('input', () => { c.tool = toolEl.value; saveToLocal(); /* keine Neurender nötig */ });
     ergEl.addEventListener('input',  () => { c.ergebnis = ergEl.value; saveToLocal(); });
     radios.forEach(r => r.addEventListener('change', () => { c.status = r.value; saveToLocal(); renderForm(); }));
   });
 }
 
 // =====================================
-// Markdown-Export (mit Meta)
+// Markdown-Export (inkl. Meta)
 // =====================================
 function exportMarkdown() {
   const now = new Date().toISOString().slice(0,19).replace('T',' ');
@@ -237,12 +223,10 @@ function exportMarkdown() {
   a.remove();
   URL.revokeObjectURL(url);
 }
-
-// Buttons verdrahten
 document.getElementById('export-md')?.addEventListener('click', exportMarkdown);
 
 // =====================================
-// JSON-Export (mit Meta)
+// JSON-Export (inkl. Meta)
 // =====================================
 function exportJSON() {
   const payload = {
@@ -266,7 +250,7 @@ function exportJSON() {
 document.getElementById('export-json')?.addEventListener('click', exportJSON);
 
 // =====================================
-// JSON-Import (Datei wählen und laden)
+// JSON-Import (inkl. Meta)
 // =====================================
 document.getElementById('import-json-btn')?.addEventListener('click', () => {
   document.getElementById('import-json')?.click();
@@ -285,10 +269,7 @@ document.getElementById('import-json')?.addEventListener('change', async (e) => 
       return;
     }
 
-    // Meta übernehmen (falls vorhanden), sonst leere Defaults
     meta = { company: "", url: "", ...(data.meta || {}) };
-
-    // Kriterien ersetzen
     criteria.length = 0;
     for (const item of data.criteria) criteria.push(item);
 
@@ -305,25 +286,21 @@ document.getElementById('import-json')?.addEventListener('change', async (e) => 
 });
 
 // =====================================
-// Neues Audit: Vorlage aus JSON laden
+// Neues Audit: Erst Meta abfragen, dann Vorlage laden
 // =====================================
 document.getElementById('new-audit')?.addEventListener('click', () => {
   if (!confirm("Neues Audit starten? Ungespeicherte Änderungen gehen verloren.")) return;
 
-  // 1) Zuerst Projektinfos abfragen
   showNewAuditForm(async () => {
     try {
-      // 2) Danach Vorlage laden
       const res = await fetch('./wcag-template.json?v=' + Date.now()); // Cache-Busting
       if (!res.ok) throw new Error('Vorlage konnte nicht geladen werden (' + res.status + ')');
       const data = await res.json();
       if (!data || !Array.isArray(data.criteria)) throw new Error("Ungültige Vorlage: Feld 'criteria' (Array) fehlt.");
 
-      // 3) Kriterien übernehmen
       criteria.length = 0;
       for (const item of data.criteria) criteria.push(item);
 
-      // 4) Speichern & UI zeichnen
       saveToLocal();
       renderForm();
 
@@ -335,6 +312,6 @@ document.getElementById('new-audit')?.addEventListener('click', () => {
   });
 });
 
-// Beim Laden: gespeicherten Stand laden und Formular anzeigen
+// Beim Laden: vorhandene Daten anzeigen (oder leer, bis „Neues Audit“/Import)
 loadFromLocal();
 renderForm();
