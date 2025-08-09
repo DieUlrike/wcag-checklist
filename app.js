@@ -1,3 +1,18 @@
+// Feste WCAG-Startvorlage (klein; später durch komplette 2.2 AA ersetzt)
+const CHECKLIST_TEMPLATE = [
+  { id: "1.1.1", titel: "Nicht-Text-Inhalte", level: "A",  tool: "", ergebnis: "", status: "na" },
+  { id: "1.3.1", titel: "Info und Beziehungen", level: "A", tool: "", ergebnis: "", status: "na" },
+  { id: "1.4.3", titel: "Kontrast Minimum", level: "AA", tool: "", ergebnis: "", status: "na" },
+  { id: "2.1.1", titel: "Tastatur", level: "A", tool: "", ergebnis: "", status: "na" },
+  { id: "2.4.3", titel: "Fokus-Reihenfolge", level: "A", tool: "", ergebnis: "", status: "na" }
+];
+
+// frische Arbeitskopie aus der Vorlage erzeugen
+function freshChecklistFromTemplate() {
+  return CHECKLIST_TEMPLATE.map(i => ({ ...i }));
+}
+
+
 // =========================
 // Kriterien-Daten (Beispiel)
 // =========================
@@ -147,3 +162,21 @@ document.getElementById('import-json')?.addEventListener('change', async (e) => 
     e.target.value = "";
   }
 });
+
+// Neues Audit aus der festen Vorlage erstellen
+document.getElementById('new-audit')?.addEventListener('click', () => {
+  if (!confirm("Neues Audit starten? Ungespeicherte Änderungen gehen verloren.")) return;
+
+  // Arbeitsdaten durch frische Kopie aus der Vorlage ersetzen
+  const fresh = freshChecklistFromTemplate();
+  criteria.length = 0;
+  for (const item of fresh) criteria.push(item);
+
+  // Optional vorhandene Hooks aufrufen (falls du sie später einbaust)
+  if (typeof saveToLocal === 'function') saveToLocal();
+  if (typeof renderForm === 'function') renderForm();
+  if (typeof renderView === 'function') renderView();
+
+  alert("Neue, leere Checkliste aus der Vorlage erstellt.");
+});
+

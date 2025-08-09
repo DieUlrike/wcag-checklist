@@ -15,17 +15,14 @@
   <main id="app">
     <section aria-labelledby="export">
       <h2 id="export">Bericht</h2>
+
+      <button id="new-audit">Neues Audit starten</button>
       <button id="export-md">Als Markdown exportieren</button>
       <button id="export-json">Als JSON exportieren</button>
-
-      <!-- Import -->
-      <label for="import-json" style="display:inline-block;margin-left:8px;">
-        <input id="import-json" type="file" accept="application/json" style="display:none">
-        <button type="button" id="import-json-btn">JSON importieren</button>
-      </label>
+      <input type="file" id="import-json" accept="application/json" style="display: none;" />
+      <button id="import-json-btn">JSON importieren</button>
     </section>
 
-    <p>Hier entsteht eine kleine Checkliste. Version 0.1</p>
   </main>
 
   <script src="./app.js"></script>
