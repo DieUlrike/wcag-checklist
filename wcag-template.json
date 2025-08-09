@@ -1,0 +1,78 @@
+{
+  "erstellt": "2025-08-09T18:20:00.000Z",
+  "version": "2.2-AA",
+  "criteria": [
+    { "id": "1.1.1",  "titel": "Nicht-Text-Inhalte",                                      "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "1.2.1",  "titel": "Nur Audio und nur Video (voraufgezeichnet)",               "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.2.2",  "titel": "Untertitel (voraufgezeichnet)",                            "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.2.3",  "titel": "Audiodeskription oder Medienalternative (voraufgezeichnet)","level": "A", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.2.4",  "titel": "Untertitel (live)",                                        "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.2.5",  "titel": "Audiodeskription (voraufgezeichnet)",                      "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "1.3.1",  "titel": "Informationen und Beziehungen",                            "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.3.2",  "titel": "Sinnvolle Reihenfolge",                                    "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.3.3",  "titel": "Sensorische Merkmale",                                     "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.3.4",  "titel": "Ausrichtung (Orientation)",                                "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.3.5",  "titel": "Zweck von Eingabefeldern identifizieren",                  "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "1.4.1",  "titel": "Verwendung von Farbe",                                     "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.2",  "titel": "Audiosteuerung",                                           "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.3",  "titel": "Kontrast (Minimum)",                                       "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.4",  "titel": "Text vergrößerbar",                                        "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.5",  "titel": "Bilder von Text",                                          "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.10", "titel": "Umbruch (Reflow)",                                         "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.11", "titel": "Nicht-Text-Kontrast",                                      "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.12", "titel": "Textabstand",                                              "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "1.4.13", "titel": "Inhalte bei Hover oder Fokus",                             "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "2.1.1",  "titel": "Tastatur",                                                 "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.1.2",  "titel": "Kein Tastatur-Fang",                                       "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.1.4",  "titel": "Zeichentastenkürzel",                                      "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "2.2.1",  "titel": "Anpassbare Zeitbegrenzung",                                "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.2.2",  "titel": "Anhalten, Stoppen, Ausblenden",                            "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "2.3.1",  "titel": "Drei Blitze oder darunter",                                "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "2.4.1",  "titel": "Blöcke umgehen",                                           "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.4.2",  "titel": "Seitentitel",                                              "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.4.3",  "titel": "Fokusreihenfolge",                                         "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.4.4",  "titel": "Link-Zweck (im Kontext)",                                  "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.4.5",  "titel": "Mehrere Wege",                                             "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.4.6",  "titel": "Überschriften und Beschriftungen",                         "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.4.7",  "titel": "Sichtbarer Fokus",                                         "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "2.4.11", "titel": "Fokus nicht verdeckt (Minimum)",                           "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.4.13", "titel": "Fokus-Erscheinungsbild",                                   "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "2.5.1",  "titel": "Zeigergesten",                                             "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.5.2",  "titel": "Zeigerabbruch (Pointer Cancellation)",                     "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.5.3",  "titel": "Label im Namen",                                           "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.5.4",  "titel": "Bewegungsaktivierung",                                     "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "2.5.7",  "titel": "Ziehen-Bewegungen (Dragging Movements)",                   "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "2.5.8",  "titel": "Zielfläche (Minimum)",                                     "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "3.1.1",  "titel": "Sprache der Seite",                                        "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.1.2",  "titel": "Sprache von Teilen",                                       "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "3.2.1",  "titel": "Bei Fokus",                                                "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.2.2",  "titel": "Bei Eingabe",                                              "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.2.3",  "titel": "Konsistente Navigation",                                   "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.2.4",  "titel": "Konsistente Identifikation",                               "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "3.2.6",  "titel": "Konsistente Hilfe",                                        "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "3.3.1",  "titel": "Fehlererkennung",                                          "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.3.2",  "titel": "Beschriftungen oder Anweisungen",                          "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.3.3",  "titel": "Fehlervorschläge",                                         "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.3.4",  "titel": "Fehlervermeidung (rechtlich, finanziell, Daten)",          "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "3.3.7",  "titel": "Doppelte Eingaben vermeiden (Redundant Entry)",            "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "3.3.8",  "titel": "Barrierefreie Authentifizierung (Minimum)",                "level": "AA", "tool": "", "ergebnis": "", "status": "na" },
+
+    { "id": "4.1.2",  "titel": "Name, Rolle, Wert",                                        "level": "A",  "tool": "", "ergebnis": "", "status": "na" },
+    { "id": "4.1.3",  "titel": "Statusmeldungen",                                          "level": "AA", "tool": "", "ergebnis": "", "status": "na" }
+  ]
+}

@@ -232,21 +232,35 @@ document.getElementById('import-json')?.addEventListener('change', async (e) => 
 });
 
 // Neues Audit aus der festen Vorlage erstellen
-document.getElementById('new-audit')?.addEventListener('click', () => {
+// Neues Audit: Vorlage aus JSON laden und übernehmen
+document.getElementById('new-audit')?.addEventListener('click', async () => {
   if (!confirm("Neues Audit starten? Ungespeicherte Änderungen gehen verloren.")) return;
 
-  // Arbeitsdaten durch frische Kopie aus der Vorlage ersetzen
-  const fresh = freshChecklistFromTemplate();
-  criteria.length = 0;
-  for (const item of fresh) criteria.push(item);
+  try {
+    // Pfad anpassen, falls die Datei woanders liegt
+    const res = await fetch('./wcag-template.json?v=' + Date.now()); // Cache-Busting
+    if (!res.ok) throw new Error('Vorlage konnte nicht geladen werden (' + res.status + ')');
 
-  // Optional vorhandene Hooks aufrufen (falls du sie später einbaust)
-  if (typeof saveToLocal === 'function') saveToLocal();
-  if (typeof renderForm === 'function') renderForm();
-  if (typeof renderView === 'function') renderView();
+    const data = await res.json();
+    if (!data || !Array.isArray(data.criteria)) {
+      throw new Error("Ungültige Vorlage: Feld 'criteria' (Array) fehlt.");
+    }
 
-  alert("Neue, leere Checkliste aus der Vorlage erstellt.");
+    // Arbeitsdaten ersetzen
+    criteria.length = 0;
+    for (const item of data.criteria) criteria.push(item);
+
+    // Speichern & UI aktualisieren
+    saveToLocal?.();
+    renderForm?.();
+
+    alert(`Neue WCAG-Vorlage geladen: ${criteria.length} Kriterien.`);
+  } catch (err) {
+    console.warn(err);
+    alert('Fehler beim Laden der Vorlage: ' + err.message);
+  }
 });
+
 
 // Beim Laden: gespeicherten Stand laden und Formular anzeigen
 loadFromLocal();
