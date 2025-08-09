@@ -1,0 +1,46 @@
+{
+  "erstellt": "2025-08-09T17:35:00.000Z",
+  "version": "0.1",
+  "criteria": [
+    {
+      "id": "1.1.1",
+      "titel": "Nicht-Text-Inhalte",
+      "level": "A",
+      "tool": "Manuelle Prüfung + Screenreader",
+      "ergebnis": "Startseiten-Logo ohne Alternativtext.",
+      "status": "fail"
+    },
+    {
+      "id": "1.3.1",
+      "titel": "Info und Beziehungen",
+      "level": "A",
+      "tool": "HTML-Inspektion",
+      "ergebnis": "Überschriftenhierarchie H1→H2→H3 korrekt.",
+      "status": "pass"
+    },
+    {
+      "id": "1.4.3",
+      "titel": "Kontrast Minimum",
+      "level": "AA",
+      "tool": "Kontrast-Checker",
+      "ergebnis": "Primärer Link 3.2:1 (unter 4.5:1).",
+      "status": "fail"
+    },
+    {
+      "id": "2.1.1",
+      "titel": "Tastatur",
+      "level": "A",
+      "tool": "Tab-Reihenfolge Test",
+      "ergebnis": "Alle interaktiven Elemente erreichbar.",
+      "status": "pass"
+    },
+    {
+      "id": "2.4.3",
+      "titel": "Fokus-Reihenfolge",
+      "level": "A",
+      "tool": "Tastaturtest",
+      "ergebnis": "Reihenfolge folgt der visuellen Anordnung.",
+      "status": "pass"
+    }
+  ]
+}

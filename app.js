@@ -34,32 +34,9 @@ function loadFromLocal() {
 
 
 
-// =========================
-// Kriterien-Daten (Beispiel)
-// =========================
-const criteria = [
-  {
-    id: "1.1.1",
-    titel: "Nicht-Text-Inhalte",
-    tool: "Manuelle Prüfung + Screenreader NVDA",
-    ergebnis: "Logo ohne Alternativtext gefunden.",
-    status: "fail"
-  },
-  {
-    id: "1.3.1",
-    titel: "Info und Beziehungen",
-    tool: "HTML-Inspektion",
-    ergebnis: "Struktur korrekt mit Überschriften ausgezeichnet.",
-    status: "pass"
-  },
-  {
-    id: "1.4.3",
-    titel: "Kontrast Minimum",
-    tool: "WAVE + manuelle Messung",
-    ergebnis: "Grauer Text auf hellgrauem Hintergrund, Kontrast 3.2:1.",
-    status: "fail"
-  }
-];
+// Arbeitskopie: startet leer aus der Vorlage (wird ggf. durch loadFromLocal überschrieben)
+let criteria = freshChecklistFromTemplate();
+
 
 console.log("WCAG Checkliste – Prototyp geladen");
 
