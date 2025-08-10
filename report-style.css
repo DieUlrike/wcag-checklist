@@ -1,0 +1,33 @@
+:root{
+  --text:#111; --muted:#555; --ok:#166534; --fail:#991b1b; --na:#374151; --border:#ddd;
+}
+
+*{ box-sizing: border-box }
+body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 24px; color: var(--text) }
+
+h1{ font-size: 22px; margin: 0 0 6px }
+h2{ font-size: 18px; margin: 22px 0 8px }
+.meta{ margin: 6px 0 16px; color: var(--muted) }
+.intro, .outro{ margin: 12px 0 12px }
+hr{ border: 0; border-top: 1px solid var(--border); margin: 16px 0 }
+
+.summary{ margin: 8px 0 0 20px }
+.summary li{ margin-bottom: 2px }
+
+.pill{
+  display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px;
+  border:1px solid var(--border);
+}
+.p-pass{ color: var(--ok); border-color: #bbf7d0; background: #f0fdf4 }
+.p-fail{ color: var(--fail); border-color: #fecaca; background: #fef2f2 }
+
+.small{ color: var(--muted); font-size: 12px }
+
+.table{ width: 100%; border-collapse: collapse; margin-top: 6px }
+.table th, .table td{ border:1px solid var(--border); padding:8px; text-align:left; vertical-align: top }
+.table th{ background:#fafafa }
+
+@media print{
+  @page{ margin: 16mm }
+  a[href]:after{ content:"" } /* keine URL-Anhänge */
+}

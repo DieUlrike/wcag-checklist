@@ -343,6 +343,103 @@ document.getElementById('new-audit')?.addEventListener('click', () => {
   });
 });
 
+// -------- PDF: Helpers --------
+function escapeHtml(s="") {
+  return String(s).replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[ch]));
+}
+
+function buildPassedList() {
+  const passed = criteria.filter(c => c.status === "pass");
+  if (passed.length === 0) return '<p class="small">Keine bestandenen Kriterien vorhanden.</p>';
+  return `<ul>${passed.map(c =>
+    `<li><strong>${escapeHtml(c.id)}</strong> – ${escapeHtml(c.titel)}${c.level?` (Level ${escapeHtml(c.level)})`:""}</li>`
+  ).join("")}</ul>`;
+}
+
+function buildFailedTable() {
+  const failed = criteria.filter(c => c.status === "fail");
+  if (failed.length === 0) return '<p class="small">Keine fehlgeschlagenen Kriterien vorhanden.</p>';
+  return `
+    <table class="table">
+      <thead>
+        <tr><th>ID</th><th>Titel</th><th>Level</th><th>Geprüft mit</th><th>Befund</th></tr>
+      </thead>
+      <tbody>
+        ${failed.map(c => `
+          <tr>
+            <td>${escapeHtml(c.id)}</td>
+            <td>${escapeHtml(c.titel)}</td>
+            <td>${escapeHtml(c.level||"")}</td>
+            <td>${escapeHtml(c.tool||"")}</td>
+            <td>${escapeHtml(c.ergebnis||"").replace(/\n/g,"<br>")}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `.trim();
+}
+
+// -------- PDF: Exportfunktion (lädt Template + CSS) --------
+async function exportPDF() {
+  try {
+    const now = new Date().toISOString().slice(0,19).replace('T',' ');
+    const totals = {
+      pass: criteria.filter(c => c.status === "pass").length,
+      fail: criteria.filter(c => c.status === "fail").length,
+      na:   criteria.filter(c => c.status === "na").length,
+      all:  criteria.length
+    };
+
+    // Dateien laden (Live Server benutzen, sonst blockiert fetch bei file://)
+    const [template, style] = await Promise.all([
+      fetch('report-template.html?v=' + Date.now()).then(r => { if(!r.ok) throw new Error('Template nicht gefunden'); return r.text(); }),
+      fetch('report-style.css?v=' + Date.now()).then(r => { if(!r.ok) throw new Error('Style nicht gefunden'); return r.text(); })
+    ]);
+
+    // Platzhalter ersetzen
+    let filled = template
+      .replaceAll('{{COMPANY}}', escapeHtml(meta.company || '—'))
+      .replaceAll('{{URL}}', escapeHtml(meta.url || '—'))
+      .replaceAll('{{DATE}}', now)
+      .replaceAll('{{TOTAL_ALL}}', String(totals.all))
+      .replaceAll('{{TOTAL_PASS}}', String(totals.pass))
+      .replaceAll('{{TOTAL_FAIL}}', String(totals.fail))
+      .replaceAll('{{TOTAL_NA}}', String(totals.na))
+      .replace('{{PASSED_LIST}}', buildPassedList())
+      .replace('{{FAILED_TABLE}}', buildFailedTable());
+
+    // finales Print-HTML bauen
+    const html = `
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>WCAG Prüfbericht – ${escapeHtml(meta.company || '')}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>${style}</style>
+</head>
+${filled}
+</html>`.trim();
+
+    const w = window.open("", "_blank");
+    if (!w) { alert("Pop-up blockiert? Bitte Pop-ups erlauben."); return; }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    w.onload = () => w.print();
+
+  } catch (err) {
+    console.warn(err);
+    alert('PDF-Export fehlgeschlagen: ' + err.message);
+  }
+}
+
+// Button verdrahten
+document.getElementById('export-pdf')?.addEventListener('click', exportPDF);
+
+
 // Beim Laden: vorhandene Daten anzeigen (oder leer, bis „Neues Audit“/Import)
 loadFromLocal();
 renderForm();

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+<body>
+  <h1>WCAG Auditbericht</h1>
+
+  <div class="meta">
+    <strong>Unternehmen:</strong> {{COMPANY}}<br>
+    <strong>Webseite:</strong> {{URL}}<br>
+    <strong>Audit-Datum:</strong> {{DATE}}
+  </div>
+
+  <hr>
+
+  <p class="intro">
+    Gern haben wir das Audit Ihrer Webseite durchgeführt. Nachfolgend finden Sie die Zusammenfassung der Ergebnisse.
+  </p>
+
+  <h2>Zusammenfassung</h2>
+  <ul class="summary">
+    <li>Gesamt: {{TOTAL_ALL}}</li>
+    <li>Bestanden: {{TOTAL_PASS}}</li>
+    <li>Handlungsbedarf: {{TOTAL_FAIL}}</li>
+    <li>Nicht anwendbar: {{TOTAL_NA}}</li>
+  </ul>
+
+  <hr>
+
+  <h2>Bestandene Kriterien <span class="pill p-pass">{{TOTAL_PASS}}</span></h2>
+  {{PASSED_LIST}}
+
+  <hr>
+
+  <h2>Fehlgeschlagene Kriterien <span class="pill p-fail">{{TOTAL_FAIL}}</span></h2>
+  {{FAILED_TABLE}}
+
+  <hr>
+
+  <p class="outro">
+    Gern unterstützen wir Sie bei der Überarbeitung der Kriterien, die fehlgeschlagen sind.
+  </p>
+</body>
+</html>
