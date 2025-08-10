@@ -19,6 +19,11 @@
   "mac": {
     "category": "public.app-category.productivity"
   },
+  "mac": {
+  "category": "public.app-category.utilities",
+  "target": "dmg",
+  "universalApp": true
+},
   "win": {
     "target": "nsis"
   }
