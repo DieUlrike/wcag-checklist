@@ -412,16 +412,16 @@ async function exportPDF() {
 
     // finales Print-HTML bauen
     const html = `
-<!doctype html>
-<html lang="de">
-<head>
-<meta charset="utf-8">
-<title>WCAG Prüfbericht – ${escapeHtml(meta.company || '')}</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>${style}</style>
-</head>
-${filled}
-</html>`.trim();
+      <!doctype html>
+      <html lang="de">
+      <head>
+      <meta charset="utf-8">
+      <title>WCAG Prüfbericht – ${escapeHtml(meta.company || '')}</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>${style}</style>
+      </head>
+      ${filled}
+      </html>`.trim();
 
     const w = window.open("", "_blank");
     if (!w) { alert("Pop-up blockiert? Bitte Pop-ups erlauben."); return; }
