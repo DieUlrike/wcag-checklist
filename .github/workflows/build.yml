@@ -1,9 +1,13 @@
-name: Build desktop apps
+name: Build desktop apps (no publish)
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+env:
+  # WICHTIG: verhindert, dass electron-builder Releases auf GitHub veröffentlichen will
+  ELECTRON_BUILDER_DISABLE_PUBLISH: true
 
 jobs:
   build-windows:
@@ -11,14 +15,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'   # LTS, stabil
+
       - name: Install dependencies
         run: npm ci || npm install
+
       - name: Build (Windows)
-        run: npm run dist
+        run: npm run dist -- --publish=never
+
       - name: Upload artifact (Windows)
         uses: actions/upload-artifact@v4
         with:
@@ -33,14 +41,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'   # LTS, stabil
+
       - name: Install dependencies
         run: npm ci || npm install
+
       - name: Build (macOS)
-        run: npm run dist
+        run: npm run dist -- --publish=never
+
       - name: Upload artifact (macOS)
         uses: actions/upload-artifact@v4
         with:
