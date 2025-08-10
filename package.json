@@ -4,9 +4,25 @@
   "description": "A web-based checklist to audit accessibility compliance according to WCAG 2.1/2.2 and export a report about the current state of accessibility.",
   "main": "main.js",
   "scripts": {
-    "start": "electron . --disable-gpu",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "start": "electron . --disable-gpu",
+  "dist": "electron-builder"
+},
+"build": {
+  "appId": "de.ulrikekretzmer.wcagchecklist",
+  "productName": "WCAG Checklist",
+  "files": [
+    "**/*",
+    "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+    "!**/.*",
+    "!*.map"
+  ],
+  "mac": {
+    "category": "public.app-category.productivity"
   },
+  "win": {
+    "target": "nsis"
+  }
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DieUlrike/wcag-checklist.git"
@@ -19,6 +35,7 @@
   },
   "homepage": "https://github.com/DieUlrike/wcag-checklist#readme",
   "devDependencies": {
-    "electron": "^37.2.6"
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12"
   }
 }
