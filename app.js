@@ -1,5 +1,5 @@
 // ---- Meta (Projektinfos) ----
-let meta = { company: "", url: "" };
+let meta = { company: "", url: "", contact: "" };
 
 // ---- Persistenz (Autosave) ----
 const STORAGE_KEY = "wcag-checklist-current";
@@ -28,7 +28,7 @@ function loadFromLocal() {
 
     // Neues Format: { meta, criteria }
     if (saved && Array.isArray(saved.criteria)) {
-      meta = { company: "", url: "", ...(saved.meta || {}) };
+      meta = { company: "", url: "", contact: "", ...(saved.meta || {}) };
       criteria.length = 0;
       for (const item of saved.criteria) criteria.push(item);
     }
@@ -61,7 +61,7 @@ function showNewAuditForm(onConfirm) {
   const content = document.getElementById('content');
   if (!content) return;
 
-  content.innerHTML = `
+    content.innerHTML = `
     <section style="border:1px solid #ddd;padding:1rem;margin:1rem 0;">
       <h2>Neues Audit starten</h2>
       <p>Bitte Projektinfos angeben. Diese erscheinen später im Bericht.</p>
@@ -78,24 +78,37 @@ function showNewAuditForm(onConfirm) {
       </label>
       <br/><br/>
 
+      <label>
+        <div>Ansprechpartner (für Anrede im Bericht) <span aria-hidden="true">*</span></div>
+        <input id="meta-contact" type="text" placeholder="z. B. Max Mustermann" style="width:100%;max-width:480px;">
+      </label>
+      <br/><br/>
+
       <button id="start-audit">Audit starten</button>
     </section>
   `;
 
-  document.getElementById('start-audit')?.addEventListener('click', () => {
+
+    document.getElementById('start-audit')?.addEventListener('click', () => {
     const companyEl = document.getElementById('meta-company');
     const urlEl = document.getElementById('meta-url');
+    const contactEl = document.getElementById('meta-contact'); // NEU
+
     const company = companyEl.value.trim();
     const urlRaw  = urlEl.value.trim();
+    const contact = (contactEl?.value || "").trim();          // NEU
 
     if (!company) { alert("Bitte Unternehmensname eingeben."); companyEl.focus(); return; }
     if (!isValidUrl(urlRaw)) { alert("Bitte eine gültige URL eingeben (z. B. https://… )."); urlEl.focus(); return; }
+    if (!contact) { alert("Bitte Ansprechpartner eintragen."); contactEl.focus(); return; } // NEU
 
     meta.company = company;
     meta.url = normalizeUrl(urlRaw);
+    meta.contact = contact; // NEU
 
     onConfirm?.();
   });
+
 }
 
 // ---- UI rendern (mit farbigen Karten je Status) ----
@@ -179,6 +192,10 @@ function renderForm() {
 function exportMarkdown() {
   const now = new Date().toISOString().slice(0,19).replace('T',' ');
 
+  const salutation = meta.contact
+  ? `Guten Tag ${meta.contact},`
+  : 'Sehr geehrte Damen und Herren,';
+
   const totals = {
     pass: criteria.filter(c => c.status === "pass").length,
     fail: criteria.filter(c => c.status === "fail").length,
@@ -198,7 +215,7 @@ function exportMarkdown() {
   parts.push('');
   parts.push('---');
   parts.push('');
-  parts.push('Sehr geehrte Damen und Herren,');
+  parts.push(salutation);
   parts.push('');
   parts.push('gern haben wir das Audit Ihrer Webseite durchgeführt. Nachfolgend finden Sie die Zusammenfassung der Ergebnisse.');
   parts.push('');
@@ -399,6 +416,10 @@ async function exportPDF() {
     ]);
 
     // Platzhalter ersetzen
+    const salutation = meta.contact
+      ? `Guten Tag ${meta.contact},`
+      : 'Sehr geehrte Damen und Herren,';
+
     let filled = template
       .replaceAll('{{COMPANY}}', escapeHtml(meta.company || '—'))
       .replaceAll('{{URL}}', escapeHtml(meta.url || '—'))
@@ -408,7 +429,10 @@ async function exportPDF() {
       .replaceAll('{{TOTAL_FAIL}}', String(totals.fail))
       .replaceAll('{{TOTAL_NA}}', String(totals.na))
       .replace('{{PASSED_LIST}}', buildPassedList())
-      .replace('{{FAILED_TABLE}}', buildFailedTable());
+      .replace('{{FAILED_TABLE}}', buildFailedTable())
+      .replaceAll('{{CONTACT}}', escapeHtml(meta.contact || '—'))   
+      .replaceAll('{{SALUTATION}}', escapeHtml(salutation));
+
 
     // finales Print-HTML bauen
     const html = `
