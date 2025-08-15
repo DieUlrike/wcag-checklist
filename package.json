@@ -15,14 +15,22 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ]
     },
     "win": {
       "target": "nsis"
     },
-    "icon": "build/icon"
+    "icon": "build/icon",
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
   },
   "repository": {
     "type": "git",
@@ -38,5 +46,8 @@
   "devDependencies": {
     "electron": "^37.2.6",
     "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
   }
 }

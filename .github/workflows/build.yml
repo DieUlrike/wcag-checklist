@@ -5,13 +5,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-env:
-  # Verhindert Release-Uploads (kein GH_TOKEN nötig)
-  ELECTRON_BUILDER_DISABLE_PUBLISH: true
-
 jobs:
   build-mac:
     runs-on: macos-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,33 +24,19 @@ jobs:
 
       # macOS Intel (x64)
       - name: Build macOS (x64)
-        run: npx electron-builder --mac --x64 --publish=never
-
-      - name: Upload artifact (macOS x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: wcag-checklist-mac-x64
-          path: |
-            dist/*.dmg
-            dist/*-mac.zip
+        run: npx electron-builder --mac --x64 --publish always
 
       - name: Clean dist
         run: rm -rf dist/*
 
       # macOS Apple Silicon (arm64)
       - name: Build macOS (arm64)
-        run: npx electron-builder --mac --arm64 --publish=never
-
-      - name: Upload artifact (macOS arm64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: wcag-checklist-mac-arm64
-          path: |
-            dist/*.dmg
-            dist/*-mac.zip
+        run: npx electron-builder --mac --arm64 --publish always
 
   build-windows:
     runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,13 +50,4 @@ jobs:
         run: npm ci || npm install
 
       - name: Build (Windows)
-        run: npm run dist -- --publish=never
-
-      - name: Upload artifact (Windows)
-        uses: actions/upload-artifact@v4
-        with:
-          name: wcag-checklist-win
-          path: |
-            dist/*.exe
-            dist/*.msi
-            dist/*.zip
+        run: npm run dist -- --publish always
