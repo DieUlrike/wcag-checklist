@@ -1,6 +1,6 @@
 {
   "name": "wcag-checklist",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "A web-based checklist to audit accessibility compliance according to WCAG 2.1/2.2 and export a report about the current state of accessibility.",
   "main": "main.js",
   "scripts": {
@@ -8,25 +8,27 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "de.ulrikekretzmer.wcagchecklist",
-    "productName": "WCAG Checklist",
-    "mac": {
-      "category": "public.app-category.productivity",
-      "target": [
-        "dmg",
-        "zip"
-      ]
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "icon": "build/icon",
-    "publish": [
-      {
-        "provider": "github"
-      }
-    ]
+  "appId": "de.ulrikekretzmer.wcagchecklist",
+  "productName": "WCAG Checklist",
+  "publish": [
+    { "provider": "github", "releaseType": "release" }
+  ],
+  "mac": {
+    "category": "public.app-category.productivity",
+    "icon": "build/icon.icns",
+    "target": [
+      { "target": "dmg" },
+      { "target": "zip" }
+    ],
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "minimumSystemVersion": "10.13"
   },
+  "win": {
+    "icon": "build/icon.ico",
+    "target": "nsis",
+    "artifactName": "${productName}-Setup-${version}.${ext}"
+  }
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DieUlrike/wcag-checklist.git"
