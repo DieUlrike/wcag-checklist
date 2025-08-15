@@ -22,6 +22,7 @@ jobs:
       - name: Install dependencies
         run: npm ci || npm install
 
+      # Universal Build (x64 + arm64 in einer App)
       - name: Build macOS Universal
         run: npx electron-builder --mac universal --publish always
 
