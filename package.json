@@ -1,6 +1,6 @@
 {
   "name": "wcag-checklist",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A web-based checklist to audit accessibility compliance according to WCAG 2.1/2.2 and export a report about the current state of accessibility.",
   "main": "main.js",
   "scripts": {
