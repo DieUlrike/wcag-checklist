@@ -1,4 +1,4 @@
-name: Build desktop apps (mac x64/arm64 + win)
+name: Build desktop apps (Universal mac + Windows)
 
 on:
   push:
@@ -6,50 +6,64 @@ on:
   workflow_dispatch:
 
 env:
-  # Verhindert Release-Uploads (kein GH_TOKEN nötig)
-  ELECTRON_BUILDER_DISABLE_PUBLISH: true
+  ELECTRON_BUILDER_DISABLE_PUBLISH: true  # kein Release-Upload nötig
 
 jobs:
-  build-mac:
+  build-mac-universal:
     runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # LTS, stabil
+          node-version: '20'
 
-      - name: Install dependencies
+      - name: Install deps
         run: npm ci || npm install
 
-      # macOS Intel (x64)
-      - name: Build macOS (x64)
+      # 1) macOS Intel (x64) bauen
+      - name: Build macOS x64
         run: npx electron-builder --mac --x64 --publish=never
+      - name: Keep x64 app
+        run: |
+          mkdir -p dist/tmp-x64
+          mv "dist/mac/WCAG Checklist.app" "dist/tmp-x64/"
 
-      - name: Upload artifact (macOS x64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: wcag-checklist-mac-x64
-          path: |
-            dist/*.dmg
-            dist/*-mac.zip
-
+      # 2) Dist leeren, damit der nächste Build sauber ist
       - name: Clean dist
-        run: rm -rf dist/*
+        run: rm -rf dist/mac dist/*.dmg dist/*-mac.zip
 
-      # macOS Apple Silicon (arm64)
-      - name: Build macOS (arm64)
+      # 3) macOS Apple Silicon (arm64) bauen
+      - name: Build macOS arm64
         run: npx electron-builder --mac --arm64 --publish=never
+      - name: Keep arm64 app
+        run: |
+          mkdir -p dist/tmp-arm64
+          mv "dist/mac-arm64/WCAG Checklist.app" "dist/tmp-arm64/"
 
-      - name: Upload artifact (macOS arm64)
+      # 4) Universal-App zusammenführen (x64 + arm64)
+      - name: Merge to Universal app
+        run: |
+          npx --yes electron-universal \
+            --x64 "dist/tmp-x64/WCAG Checklist.app" \
+            --arm64 "dist/tmp-arm64/WCAG Checklist.app" \
+            --out "dist/WCAG Checklist.app"
+
+      # 5) Universal-App zippen (DMG ist optional; ZIP reicht zum Testen)
+      - name: Zip Universal app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            "dist/WCAG Checklist.app" \
+            "dist/WCAG-Checklist-mac-universal.zip"
+
+      # 6) Artefakt hochladen
+      - name: Upload Universal artifact (mac)
         uses: actions/upload-artifact@v4
         with:
-          name: wcag-checklist-mac-arm64
-          path: |
-            dist/*.dmg
-            dist/*-mac.zip
+          name: wcag-checklist-mac-universal
+          path: dist/WCAG-Checklist-mac-universal.zip
 
   build-windows:
     runs-on: windows-latest
@@ -57,15 +71,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: Install deps
         run: npm ci || npm install
 
-      - name: Build (Windows)
+      - name: Build Windows
         run: npm run dist -- --publish=never
 
       - name: Upload artifact (Windows)
@@ -75,4 +89,3 @@ jobs:
           path: |
             dist/*.exe
             dist/*.msi
-            dist/*.zip
