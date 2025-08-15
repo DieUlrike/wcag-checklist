@@ -22,16 +22,9 @@ jobs:
       - name: Install dependencies
         run: npm ci || npm install
 
-      # macOS Intel (x64)
-      - name: Build macOS (x64)
-        run: npx electron-builder --mac --x64 --publish always
-
-      - name: Clean dist
-        run: rm -rf dist/*
-
-      # macOS Apple Silicon (arm64)
-      - name: Build macOS (arm64)
-        run: npx electron-builder --mac --arm64 --publish always
+      # macOS Intel + Apple Silicon in einem Schritt
+      - name: Build macOS (x64 + arm64)
+        run: npx electron-builder --mac --x64 --arm64 --publish always
 
   build-windows:
     runs-on: windows-latest
