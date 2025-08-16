@@ -19,4 +19,4 @@ All notable changes to this project will be documented in this file.
 ### Known limitations
 - macOS auto-update requires a paid Apple Developer certificate; for now updates are manual (download new DMG/ZIP from Releases).
 
-[1.0.0]: https://github.com/DieUlrike/wcag-checklist/releases/tag/1.0.0
+[1.0.0]: https://github.com/DieUlrike/wcag-checklist/releases/tag/v1.0.0
