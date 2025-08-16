@@ -1,6 +1,6 @@
 # WCAG Checklist
 
-A web-based checklist to audit accessibility compliance according to WCAG 2.1/2.2 and export a report about the current state of accessibility.
+A checklist to audit accessibility compliance according to WCAG 2.1/2.2 and export a report about the current state of accessibility.
 
 ## Features
 - Load a WCAG template (JSON) and check pass/fail criteria
