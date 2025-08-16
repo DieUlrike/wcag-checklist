@@ -124,23 +124,25 @@ function renderForm() {
   };
 
   content.innerHTML = `
-    <section>
-      <h2>Zusammenfassung</h2>
-      <ul>
-        <li><strong>Unternehmen:</strong> ${meta.company || "—"}</li>
-        <li><strong>Webseite:</strong> ${meta.url || "—"}</li>
-      </ul>
-      <ul>
-        <li>Gesamt: ${totals.all}</li>
-        <li>Bestanden: ${totals.pass}</li>
-        <li>Handlungsbedarf: ${totals.fail}</li>
-        <li>Nicht anwendbar: ${totals.na}</li>
-      </ul>
-    </section>
-    <section>
-      <h2>Kriterien ausfüllen</h2>
-      <div id="crit-list"></div>
-    </section>
+  <section>
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li><strong>Unternehmen:</strong> ${meta.company || "—"}</li>
+      <li><strong>Webseite:</strong> ${meta.url || "—"}</li>
+      <li><strong>Ansprechpartner:</strong> ${meta.contact || "—"}</li>
+      <li><strong>WCAG Version:</strong> 2.1/2.2</li> <!-- NEU -->
+    </ul>
+    <ul>
+      <li>Gesamt: ${totals.all}</li>
+      <li>Bestanden: ${totals.pass}</li>
+      <li>Handlungsbedarf: ${totals.fail}</li>
+      <li>Nicht anwendbar: ${totals.na}</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Kriterien ausfüllen</h2>
+    <div id="crit-list"></div>
+  </section>
   `;
 
   const list = document.getElementById('crit-list');

@@ -1,7 +1,7 @@
 {
   "name": "wcag-checklist",
-  "version": "1.0.11",
-  "description": "A web-based checklist to audit accessibility compliance according to WCAG 2.1/2.2 and export a report about the current state of accessibility.",
+  "version": "1.1.0",
+  "description": "A checklist to audit accessibility compliance according to WCAG 2.1/2.2 and export a report about the current state of accessibility.",
   "main": "main.js",
   "scripts": {
     "start": "electron . --disable-gpu",
