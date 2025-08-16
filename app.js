@@ -187,14 +187,10 @@ function renderForm() {
 }
 
 // =====================================
-// Markdown-Export (Bericht mit Begründungen)
+// Markdown-Export (immer interne Vollversion, ohne JSON-Dump)
 // =====================================
 function exportMarkdown() {
   const now = new Date().toISOString().slice(0,19).replace('T',' ');
-
-  const salutation = meta.contact
-  ? `Guten Tag ${meta.contact},`
-  : 'Sehr geehrte Damen und Herren,';
 
   const totals = {
     pass: criteria.filter(c => c.status === "pass").length,
@@ -203,21 +199,28 @@ function exportMarkdown() {
     all:  criteria.length
   };
 
-  const passed = criteria.filter(c => c.status === "pass");
-  const failed = criteria.filter(c => c.status === "fail");
+  const notapp = criteria.filter(c => c.status === "na");
+
+  // Helper: Markdown-Escape für Tabelle
+  const mdEscape = (s="") => String(s).replace(/\|/g, "\\|");
+
+  // Komplette Tabelle
+  const mdTableAll = (rows) => {
+    if (rows.length === 0) return "_Keine Einträge._";
+    const header = `| Status | ID | Titel | Level | Geprüft mit | Befund |\n|---|---|---|---|---|---|`;
+    const body = rows.map(c =>
+      `| ${c.status||""} | ${mdEscape(c.id||"")} | ${mdEscape(c.titel||"")} | ${mdEscape(c.level||"")} | ${mdEscape(c.tool||"")} | ${mdEscape((c.ergebnis||"").replace(/\n/g," "))} |`
+    ).join("\n");
+    return [header, body].join("\n");
+  };
 
   const parts = [];
-  parts.push('# WCAG Auditbericht');
+  parts.push('# WCAG Auditbericht (intern)');
   parts.push('');
   parts.push(`**Unternehmen:** ${meta.company || "—"}`);
   parts.push(`**Webseite:** ${meta.url || "—"}`);
   parts.push(`**Audit-Datum:** ${now}`);
-  parts.push('');
-  parts.push('---');
-  parts.push('');
-  parts.push(salutation);
-  parts.push('');
-  parts.push('gern haben wir das Audit Ihrer Webseite durchgeführt. Nachfolgend finden Sie die Zusammenfassung der Ergebnisse.');
+  if (meta.contact) parts.push(`**Ansprechpartner:** ${meta.contact}`);
   parts.push('');
   parts.push('---');
   parts.push('');
@@ -230,41 +233,27 @@ function exportMarkdown() {
   parts.push('');
   parts.push('---');
   parts.push('');
-  parts.push('## Bestandene Kriterien');
+  parts.push('## Alle Kriterien');
   parts.push('');
-  if (passed.length === 0) {
-    parts.push('_Keine bestandenen Kriterien vorhanden._');
-  } else {
-    for (const c of passed) {
-      parts.push(`- **${c.id} – ${c.titel}**${c.level ? ` (Level ${c.level})` : ''}`);
-    }
+  parts.push(mdTableAll(criteria));
+  parts.push('');
+
+  if (notapp.length > 0) {
+    parts.push('---');
+    parts.push('');
+    parts.push('## Nicht anwendbar (Liste)');
+    parts.push('');
+    parts.push(notapp.map(c => `- ${c.id} – ${c.titel}${c.level?` (Level ${c.level})`:""}`).join("\n"));
+    parts.push('');
   }
-  parts.push('');
-  parts.push('---');
-  parts.push('');
-  parts.push('## Fehlgeschlagene Kriterien');
-  parts.push('');
-  if (failed.length === 0) {
-    parts.push('_Keine fehlgeschlagenen Kriterien vorhanden._');
-  } else {
-    for (const c of failed) {
-      parts.push(`- **${c.id} – ${c.titel}**${c.level ? ` (Level ${c.level})` : ''}`);
-      if (c.tool)     parts.push(`  - Geprüft mit: ${c.tool}`);
-      if (c.ergebnis) parts.push(`  - Ergebnis: ${c.ergebnis}`);
-    }
-  }
-  parts.push('');
-  parts.push('---');
-  parts.push('');
-  parts.push('Gern unterstützen wir Sie bei der Überarbeitung der Kriterien, die fehlgeschlagen sind.');
-  parts.push('');
 
   const md = parts.join('\n');
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
+  const stamp = now.replace(/[: ]/g,'-');
   a.href = url;
-  a.download = `wcag-bericht-${now.replace(/[: ]/g,'-')}.md`;
+  a.download = `wcag-bericht-internal-${stamp}.md`;
   document.body.appendChild(a);
   a.click();
   a.remove();
